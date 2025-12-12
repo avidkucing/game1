@@ -1,0 +1,44 @@
+Lets finalize the game idea. For now, this will be an auto shooter endless battle with futuristic theme and planes as the hero.
+I want to call it Airforce Mayhem: Endless.
+Fow now, there will be an Endless stage, but more kind of stages will be available in the future.
+In the battles, the player will be in the bottom while enemies appear on the upper part of the screen. 
+Player will be able to pick up power ups on the stage that upgrades their weapon according to some upgrade trees.
+There will be multiple planes with different weapon type, for now built one with the projectile type.
+Scores will be calculated based on score multiplier and time survived. Score multiplier is set before the stage, and correspond to the stage difficulty.
+There will be highscore ranking.
+Each stage will cost energy. Energy refresh overtime.
+
+Here is a general development checklist for **Airforce Mayhem: Endless**, broken down by system. This will help us track our progress.
+
+### **Phase 1: Core Mechanics (The "Toy")**
+* [x] **Player Controller:** Move the plane (Touch/Mouse drag).
+* [x] **Shooting System:** Basic projectile firing (Auto-fire).
+* [x] **Enemy Spawning:** Basic enemies moving from Top -> Bottom.
+* [x] **Collision Detection:** Bullets hit Enemies; Enemies hit Player.
+* [x] **Damage System:** HP reduction and simple destruction (Despawn).
+
+### **Phase 2: Progression & Power-ups**
+* [ ] **Power-up Drops:** Enemies have a chance to drop upgrade items.
+* [ ] **Upgrade Tree Logic:** System to track weapon levels (e.g., Level 1 → Double Shot → Spread Shot).
+* [ ] **Weapon Varieties:** Implement the specific "Projectile Type" weapon behavior.
+
+### **Phase 3: Game Loop & Metagame**
+* [ ] **Scoring System:**
+    * Track Time Survived.
+    * Implement Difficulty Multiplier logic.
+    * Calculate Final Score.
+* [ ] **Wave Manager:** Logic to increase difficulty/enemy density over time (Endless logic).
+* [ ] **Game Over Condition:** Trigger "Run End" screen when HP reaches 0.
+* [ ] **Highscore System:** Save and load the top scores.
+
+### **Phase 4: Economy (Energy System)**
+* [ ] **Energy Logic:** Max energy, current energy, subtraction per play.
+* [ ] **Timer System:** Recharge energy over real-time (even when the game is closed).
+* [ ] **UI Integration:** Prevent "Start Game" if energy is too low.
+
+### **Phase 5: UI & Polish**
+* [ ] **HUD:** Health bar, Score counter, Weapon Level indicator.
+* [ ] **Main Menu:** Play button, Highscore button, Energy display.
+* [ ] **Visuals:** Sprite replacements (Futuristic Planes), Background scrolling.
+
+
