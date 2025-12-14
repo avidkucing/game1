@@ -6,18 +6,35 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     [Header("Game Settings")]
-    public float scoreMultiplier = 1.0f; // Set this based on difficulty later
+    public float scoreMultiplier = 1.0f;
+
+    [Header("UI Panels")]
+    public GameObject mainMenuPanel;
+    public GameObject hudPanel;
+    public GameObject gameOverPanel;
+
+    [Header("Game References")]
+    public PlayerController playerScript;
+    public AutoShooter gunScript;
+    public EnemySpawner spawnerScript;
 
     [Header("Live Stats")]
     public float survivalTime = 0f;
     public float currentScore = 0f;
 
-    private bool isGameActive = true;
+    private bool isGameActive = false; // Start false so we see the menu first
 
     void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+    }
+
+    void Start()
+    {
+        // When the game launches, we don't start playing immediately.
+        // We show the Main Menu instead.
+        ShowMainMenu();
     }
 
     void Update()
@@ -28,22 +45,49 @@ public class GameManager : MonoBehaviour
         survivalTime += Time.deltaTime;
 
         // 2. Update UI (Timer)
-        // We format it to minutes:seconds
         if (UIController.Instance != null)
         {
             UIController.Instance.UpdateTime(survivalTime);
         }
     }
 
+    // --- NEW: MENU LOGIC ---
+
+    public void ShowMainMenu()
+    {
+        isGameActive = false;
+        Time.timeScale = 1f; // Ensure time is running so background scrolls
+
+        if(mainMenuPanel) mainMenuPanel.SetActive(true);
+        if(hudPanel) hudPanel.SetActive(false);
+        if(gameOverPanel) gameOverPanel.SetActive(false);
+
+        if (playerScript != null) playerScript.enabled = false;
+        if (gunScript != null) gunScript.enabled = false;
+        if (spawnerScript != null) spawnerScript.enabled = false;
+    }
+
+    public void StartGame()
+    {
+        isGameActive = true;
+
+        if(mainMenuPanel) mainMenuPanel.SetActive(false);
+        if(hudPanel) hudPanel.SetActive(true);
+
+        if (playerScript != null) playerScript.enabled = true;
+        if (gunScript != null) gunScript.enabled = true;
+        if (spawnerScript != null) spawnerScript.enabled = true;
+    }
+
+    // --- EXISTING LOGIC ---
+
     public void AddScore(float basePoints)
     {
         if (!isGameActive) return;
 
-        // Apply the multiplier logic
         float finalPoints = basePoints * scoreMultiplier;
         currentScore += finalPoints;
 
-        // Update UI (Score)
         if (UIController.Instance != null)
         {
             UIController.Instance.UpdateScore((int)currentScore);
@@ -52,17 +96,17 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        if (!isGameActive) return; // Prevent double-triggering
+        if (!isGameActive) return;
         
         isGameActive = false;
 
-        // 1. Stop the game physics/movement
-        // This freezes the background, enemies, and bullets in place
+        // Freeze physics
         Time.timeScale = 0f; 
 
-        // 2. Show the UI
+        // Show Game Over UI
         if (UIController.Instance != null)
         {
+            // We pass the score to the UI
             UIController.Instance.ShowGameOverScreen((int)currentScore);
         }
         
@@ -71,9 +115,8 @@ public class GameManager : MonoBehaviour
 
     public void QuitToMenu()
     {
-        Time.timeScale = 1f;
-        // For now, just reload the game or log plain text
-        Debug.Log("Returning to Menu... (Scene not made yet)");
-        // SceneManager.LoadScene("MainMenu"); 
+        Time.timeScale = 1f; // Unpause!
+        // Reloads the scene to clean up all bullets/enemies automatically
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

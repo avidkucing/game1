@@ -9,6 +9,7 @@ There will be highscore ranking.
 Each stage will cost energy. Energy refresh overtime.
 
 Here is a general development checklist for **Airforce Mayhem: Endless**, broken down by system. This will help us track our progress.
+x is done, - is partially
 
 ### **Phase 1: Core Mechanics (The "Toy")**
 * [x] **Player Controller:** Move the plane (Touch/Mouse drag).
@@ -37,8 +38,8 @@ Here is a general development checklist for **Airforce Mayhem: Endless**, broken
 * [ ] **UI Integration:** Prevent "Start Game" if energy is too low.
 
 ### **Phase 5: UI & Polish**
-* [ ] **HUD:** Health bar, Score counter, Weapon Level indicator.
-* [ ] **Main Menu:** Play button, Highscore button, Energy display.
-* [ ] **Visuals:** Sprite replacements (Futuristic Planes), Background scrolling.
+* [-] **HUD:** Health bar, Score counter, Weapon Level indicator.
+* [-] **Main Menu:** Play button, Highscore button, Energy display.
+* [-] **Visuals:** Sprite replacements (Futuristic Planes), Background scrolling.
 
 
