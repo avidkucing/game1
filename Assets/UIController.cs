@@ -1,16 +1,23 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // If using TextMeshPro
+using TMPro;
 
 public class UIController : MonoBehaviour
 {
-    // Singleton instance so other scripts can easily find this
     public static UIController Instance;
 
-    [Header("UI References")]
+    [Header("HUD References")]
     public Slider healthSlider;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI timeText;
+
+    [Header("Menu References")]
+    public TextMeshProUGUI menuHighScoreText; // Assign in Inspector
+
+    [Header("Game Over Screen")]
+    public GameObject gameOverPanel;
+    public TextMeshProUGUI finalScoreText;
+    public TextMeshProUGUI finalHighScoreText; // Assign in Inspector
 
     void Awake()
     {
@@ -18,46 +25,48 @@ public class UIController : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    // Call this when the game starts to set max values
     public void InitializeHealth(float currentHP, float maxHP)
     {
-        healthSlider.maxValue = maxHP;
-        healthSlider.value = currentHP;
+        if(healthSlider) 
+        {
+            healthSlider.maxValue = maxHP;
+            healthSlider.value = currentHP;
+        }
     }
 
-    // Call this whenever the player takes damage
     public void UpdateHealth(float currentHP)
     {
-        healthSlider.value = currentHP;
+        if(healthSlider) healthSlider.value = currentHP;
     }
 
-    // Call this to update the score display
     public void UpdateScore(int score)
     {
-        scoreText.text = "SCORE: " + score.ToString("D6"); // "D6" makes it 000500
+        if(scoreText) scoreText.text = "SCORE: " + score.ToString("D6");
     }
     
-    // We can update time in the GameLoop later, but here is the setup
     public void UpdateTime(float time)
     {
-        // Simple format for seconds
-        timeText.text = "T+" + time.ToString("F1") + "s";
+        if(timeText) timeText.text = "T+" + time.ToString("F1") + "s";
     }
 
-    [Header("Game Over Screen")]
-    public GameObject gameOverPanel;
-    public TextMeshProUGUI finalScoreText;
-
-    // Call this method when the player dies
-    public void ShowGameOverScreen(int score)
+    public void UpdateHighScoreText(int highScore)
     {
-        // 1. Activate the panel
+        if (menuHighScoreText) 
+            menuHighScoreText.text = "BEST: " + highScore.ToString("D6");
+    }
+
+    public void ShowGameOverScreen(int score, int highScore)
+    {
         gameOverPanel.SetActive(true);
 
-        // 2. Set the score text
-        finalScoreText.text = "FINAL SCORE: " + score.ToString("D6");
+        if(finalScoreText) finalScoreText.text = "FINAL SCORE: " + score.ToString("D6");
         
-        // Optional: Hide the HUD (Health/Timer) so it looks cleaner
-        // healthSlider.gameObject.SetActive(false); 
+        if(finalHighScoreText)
+        {
+            if(score >= highScore && score > 0)
+                finalHighScoreText.text = "NEW HIGH SCORE!";
+            else
+                finalHighScoreText.text = "BEST: " + highScore.ToString("D6");
+        }
     }
 }

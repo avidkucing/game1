@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // Needed to reload scenes
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Game Settings")]
     public float scoreMultiplier = 1.0f;
-
+    
     [Header("UI Panels")]
     public GameObject mainMenuPanel;
     public GameObject hudPanel;
@@ -21,8 +21,9 @@ public class GameManager : MonoBehaviour
     [Header("Live Stats")]
     public float survivalTime = 0f;
     public float currentScore = 0f;
+    public int highScore = 0;
 
-    private bool isGameActive = false; // Start false so we see the menu first
+    private bool isGameActive = false;
 
     void Awake()
     {
@@ -32,8 +33,9 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // When the game launches, we don't start playing immediately.
-        // We show the Main Menu instead.
+        // Load Highscore from disk
+        highScore = PlayerPrefs.GetInt("HighScore", 0);
+        
         ShowMainMenu();
     }
 
@@ -44,54 +46,75 @@ public class GameManager : MonoBehaviour
         // 1. Handle Timer
         survivalTime += Time.deltaTime;
 
-        // 2. Update UI (Timer)
+        // 2. Score based on Survival Time (10 points per second * multiplier)
+        // This encourages staying alive, not just killing
+        float timeScore = 10f * Time.deltaTime * scoreMultiplier;
+        currentScore += timeScore;
+
+        // 3. Update UI
         if (UIController.Instance != null)
         {
             UIController.Instance.UpdateTime(survivalTime);
+            UIController.Instance.UpdateScore((int)currentScore);
         }
     }
 
-    // --- NEW: MENU LOGIC ---
+    // --- MENU LOGIC ---
 
     public void ShowMainMenu()
     {
         isGameActive = false;
-        Time.timeScale = 1f; // Ensure time is running so background scrolls
+        Time.timeScale = 1f;
 
         if(mainMenuPanel) mainMenuPanel.SetActive(true);
         if(hudPanel) hudPanel.SetActive(false);
         if(gameOverPanel) gameOverPanel.SetActive(false);
 
-        if (playerScript != null) playerScript.enabled = false;
-        if (gunScript != null) gunScript.enabled = false;
-        if (spawnerScript != null) spawnerScript.enabled = false;
+        ToggleGameplayScripts(false);
+
+        // Show Highscore on Menu
+        if (UIController.Instance != null)
+        {
+            UIController.Instance.UpdateHighScoreText(highScore);
+        }
+    }
+
+    // Called by difficulty buttons in the future
+    public void SetDifficulty(float multiplier)
+    {
+        scoreMultiplier = multiplier;
     }
 
     public void StartGame()
     {
+        // Reset Stats
+        currentScore = 0;
+        survivalTime = 0;
+        
         isGameActive = true;
 
         if(mainMenuPanel) mainMenuPanel.SetActive(false);
         if(hudPanel) hudPanel.SetActive(true);
 
-        if (playerScript != null) playerScript.enabled = true;
-        if (gunScript != null) gunScript.enabled = true;
-        if (spawnerScript != null) spawnerScript.enabled = true;
+        ToggleGameplayScripts(true);
     }
 
-    // --- EXISTING LOGIC ---
+    void ToggleGameplayScripts(bool state)
+    {
+        if (playerScript != null) playerScript.enabled = state;
+        if (gunScript != null) gunScript.enabled = state;
+        if (spawnerScript != null) spawnerScript.enabled = state;
+    }
+
+    // --- GAMEPLAY LOGIC ---
 
     public void AddScore(float basePoints)
     {
         if (!isGameActive) return;
-
+        
+        // Add score from kills
         float finalPoints = basePoints * scoreMultiplier;
         currentScore += finalPoints;
-
-        if (UIController.Instance != null)
-        {
-            UIController.Instance.UpdateScore((int)currentScore);
-        }
     }
 
     public void GameOver()
@@ -99,15 +122,20 @@ public class GameManager : MonoBehaviour
         if (!isGameActive) return;
         
         isGameActive = false;
+        Time.timeScale = 0f; // Pause Physics
 
-        // Freeze physics
-        Time.timeScale = 0f; 
+        // Check High Score
+        if (currentScore > highScore)
+        {
+            highScore = (int)currentScore;
+            PlayerPrefs.SetInt("HighScore", highScore);
+            PlayerPrefs.Save();
+            Debug.Log("New High Score Saved: " + highScore);
+        }
 
-        // Show Game Over UI
         if (UIController.Instance != null)
         {
-            // We pass the score to the UI
-            UIController.Instance.ShowGameOverScreen((int)currentScore);
+            UIController.Instance.ShowGameOverScreen((int)currentScore, highScore);
         }
         
         Debug.Log("Game Over Triggered.");
@@ -115,8 +143,7 @@ public class GameManager : MonoBehaviour
 
     public void QuitToMenu()
     {
-        Time.timeScale = 1f; // Unpause!
-        // Reloads the scene to clean up all bullets/enemies automatically
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

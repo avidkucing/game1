@@ -19,9 +19,9 @@ x is done, - is partially
 * [x] **Damage System:** HP reduction and simple destruction (Despawn).
 
 ### **Phase 2: Progression & Power-ups**
-* [ ] **Power-up Drops:** Enemies have a chance to drop upgrade items.
-* [ ] **Upgrade Tree Logic:** System to track weapon levels (e.g., Level 1 → Double Shot → Spread Shot).
-* [ ] **Weapon Varieties:** Implement the specific "Projectile Type" weapon behavior.
+* [x] **Power-up Drops:** Enemies have a chance to drop upgrade items.
+* [x] **Upgrade Tree Logic:** System to track weapon levels (e.g., Level 1 → Double Shot → Spread Shot).
+* [x] **Weapon Varieties:** Implement the specific "Projectile Type" weapon behavior.
 
 ### **Phase 3: Game Loop & Metagame**
 * [ ] **Scoring System:**
