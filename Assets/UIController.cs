@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System; // For TimeSpan
 
 public class UIController : MonoBehaviour
 {
@@ -12,12 +13,14 @@ public class UIController : MonoBehaviour
     public TextMeshProUGUI timeText;
 
     [Header("Menu References")]
-    public TextMeshProUGUI menuHighScoreText; // Assign in Inspector
+    public TextMeshProUGUI menuHighScoreText;
+    public TextMeshProUGUI energyText;      // e.g., "5/5"
+    public TextMeshProUGUI energyTimerText; // e.g., "00:59"
 
     [Header("Game Over Screen")]
     public GameObject gameOverPanel;
     public TextMeshProUGUI finalScoreText;
-    public TextMeshProUGUI finalHighScoreText; // Assign in Inspector
+    public TextMeshProUGUI finalHighScoreText;
 
     void Awake()
     {
@@ -54,6 +57,31 @@ public class UIController : MonoBehaviour
         if (menuHighScoreText) 
             menuHighScoreText.text = "BEST: " + highScore.ToString("D6");
     }
+
+    // --- NEW ENERGY UI ---
+
+    public void UpdateEnergyDisplay(int current, int max)
+    {
+        if (energyText) 
+            energyText.text = $"ENERGY: {current}/{max}";
+        
+        // Hide timer if energy is full
+        if (current >= max && energyTimerText != null)
+        {
+            energyTimerText.text = "FULL";
+        }
+    }
+
+    public void UpdateEnergyTimer(TimeSpan timeRemaining)
+    {
+        if (energyTimerText)
+        {
+            // Format time as MM:SS
+            energyTimerText.text = string.Format("{0:D2}:{1:D2}", timeRemaining.Minutes, timeRemaining.Seconds);
+        }
+    }
+
+    // ---------------------
 
     public void ShowGameOverScreen(int score, int highScore)
     {
