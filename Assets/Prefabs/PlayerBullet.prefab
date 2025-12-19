@@ -105,7 +105,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   speed: 20
+  damage: 1
   lifetime: 2
+  impactEffectPrefab: {fileID: 8418813914327055739, guid: 52ae84d8b448d7e479fac20bba772468, type: 3}
 --- !u!58 &4721183881036476227
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -13,6 +13,9 @@ public class EnemyController : MonoBehaviour
     [Range(0f, 1f)]
     public float dropChance = 0.2f; // 20% chance to drop
 
+    [Header("VFX")]
+    public GameObject explosionPrefab;
+
     void Start()
     {
         currentHealth = maxHealth;
@@ -40,16 +43,18 @@ public class EnemyController : MonoBehaviour
 
     void Die()
     {
-        // 1. Notify Score
+        if (explosionPrefab != null)
+        {
+            Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+        }
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.AddScore(scoreValue);
         }
 
-        // 2. Try to drop PowerUp
         TryDropLoot();
 
-        // 3. Destroy Enemy
         Destroy(gameObject);
     }
 

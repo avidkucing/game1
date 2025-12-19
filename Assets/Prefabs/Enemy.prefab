@@ -183,3 +183,4 @@ MonoBehaviour:
   scoreValue: 100
   powerUpPrefab: {fileID: 4643301931357552676, guid: 57fc9d5e9f200fe4fb93a43a8657e8da, type: 3}
   dropChance: 0.75
+  explosionPrefab: {fileID: 7420702978577761012, guid: 506f4fd9f1ece124db3b8e757bd17dc7, type: 3}

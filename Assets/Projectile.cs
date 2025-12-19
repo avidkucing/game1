@@ -5,6 +5,7 @@ public class Projectile : MonoBehaviour
     public float speed = 10f;
     public int damage = 1; // How much this bullet hurts
     public float lifetime = 2f; // Auto-destroy after 2 seconds
+    public GameObject impactEffectPrefab;
 
     void Start()
     {
@@ -22,16 +23,17 @@ public class Projectile : MonoBehaviour
         // Check if the object we hit has the tag "Enemy"
         if (other.CompareTag("Enemy"))
         {
-            // 1. Get the Enemy script component
+            if (impactEffectPrefab != null)
+            {
+                Instantiate(impactEffectPrefab, transform.position, Quaternion.identity);
+            }
+            
             EnemyController enemy = other.GetComponent<EnemyController>();
-
-            // 2. If the script exists, deal damage
             if (enemy != null)
             {
                 enemy.TakeDamage(damage);
             }
 
-            // 3. Destroy the bullet (it hit something)
             Destroy(gameObject);
         }
     }
