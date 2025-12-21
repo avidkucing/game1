@@ -7,3 +7,133 @@ There will be multiple planes with different weapon type, for now built one with
 Scores will be calculated based on score multiplier and time survived. Score multiplier is set before the stage, and correspond to the stage difficulty.
 There will be highscore ranking.
 Each stage will cost energy. Energy refresh overtime.
+
+This adds a layer of high-stakes permanence: once you use a base component for an evolution, it is "locked in" and cannot be used to create any other combinations. This forces the player to plan their final 12-slot build (6 Attack / 6 Defense) very carefully. 
+
+# Technical Documentation: Airforce Mayhem: Endless – Strategy & Synthesis System
+
+This document outlines the finalized technical and strategic specifications for the upgrade and compounding synthesis system. 
+
+---
+
+## 1. Core Mechanics: Luck & Sustainability
+
+The **Luck** stat manages the economy of power-up drops during endless play. 
+
+### Drop Rate Logic
+
+* 
+**Initial Drop Rate**: 100% for the first Power-Up. 
+
+* 
+**Decay Rate**: Base **50% multiplicative decay** per drop (100% → 50% → 25%). 
+
+* 
+**Drop Floor**: Base **0.01%** (Adjustable). 
+
+* **Luck Scaling (Level 1–5)**:
+* 
+**Decay Reduction**: Each point of Luck decreases the current decay rate by **10%** (e.g., Luck Lv1 changes decay to 40%). 
+
+* 
+**Floor Buff**: Each point increases the current drop floor value by **20%** compound. 
+
+---
+
+## 2. Upgrade Selection & Weighting
+
+Players receive a **"Pick 1 of 3"** UI upon collection. 
+
+### Selection Pool Rules
+
+* 
+**Weights**: Common Upgrades (**100**), Epic Upgrades (**20**). 
+
+* 
+**Sticky Selection Bias**: Once an upgrade is picked, its show rate is multiplied by **2.0x** to help reach Level 5 faster. 
+
+* 
+**Rerolls**: 1 free adjustable reroll per run (plus 2 via future Ad implementation). 
+
+* 
+**Synthesis Availability**: Once a pair reaches Level 5, the **Evolution** card enters the pool with **Priority Weight 250**. 
+
+---
+
+## 3. Offensive Synthesis (15 Possible Combinations)
+
+Evolutions **compound** with your existing weapons. Once a pair is synthesized, **those specific Level 5 components are consumed** and can no longer be used for other evolutions. 
+
+| Pair | Evolution Name | Technical Effect |
+| --- | --- | --- |
+| **FR + PR** | **Plasma Laser** | Adds a continuous high-damage piercing beam to the arsenal. |
+| **FR + SZ** | **Vulcan Slugger** | Adds massive, high-impact projectiles fired at extreme speeds. |
+| **FR + EX** | **Napalm Rain** | Adds rapid rounds that create persistent burning pools on impact. |
+| **FR + SP** | **Storm Front** | Emits a high-frequency aura of micro-projectiles around the ship. |
+| **FR + HM** | **Hunter Swarm** | Adds high-speed micro-missiles that seek targets aggressively. |
+| **PR + SZ** | **Singularity Cannon** | Adds a massive orb that pulls enemies into its center. |
+| **PR + EX** | **Cluster Shell** | Projectiles explode at every enemy they pierce. |
+| **PR + SP** | **Sawblade Launcher** | Adds piercing blades that bounce off screen edges. |
+| **PR + HM** | **Railgun Wraith** | Adds bolts that prioritize and pierce the 3 strongest enemies. |
+| **SZ + EX** | **Mega-Detonator** | Adds a gargantuan shell with a screen-clearing explosion radius. |
+| **SZ + SP** | **Sonic Shockwave** | Adds expanding force pulses that push and damage enemies. |
+| **SZ + HM** | **Meteor Strike** | Adds heavy, massive seeking orbs that crush targets. |
+| **EX + SP** | **Flak Barrage** | Adds a wide spread of shells that shatter into shrapnel. |
+| **EX + HM** | **Homing Missiles** | Adds classic heavy seeking rockets with large AOE damage. |
+| **SP + HM** | **Ghost Daggers** | Adds a spread of seeking projectiles that phase through obstacles. |
+
+*(FR: Fire Rate, PR: Piercing, SZ: Size, EX: Exploding, SP: Spread, HM: Homing)* 
+
+---
+
+## 4. Defensive & Utility Synthesis (15 Possible Combinations)
+
+Defensive evolutions provide permanent compounding passives. Using a component for one passive **consumes it**, preventing its use in other pairings. 
+
+| Pair | Evolution Name | Technical Effect |
+| --- | --- | --- |
+| **HP + RG** | **Vampiric Plating** | Kills restore HP; over-healing generates a stackable shield. |
+| **HP + AR** | **Titan Frame** | Massive HP; individual hits are capped at 5% of Max HP. |
+| **HP + MG** | **Gravity Anchor** | Increased weight; health drops are pulled from any distance. |
+| **HP + LK** | **God’s Favor** | Permanent +50% HP; death has 50% chance to drop 5 Power-Ups. |
+| **HP + TM** | **Iron Rebirth** | Revive with 100% HP and permanent Max HP buff. |
+| **RG + AR** | **Solar Flare** | Deal massive damage while in the "Ghost" (invulnerable) state. |
+| **RG + MG** | **Nano-Bots** | Magnet pulls enemy "Scrap" to speed up HP Regen timer. |
+| **RG + LK** | **Phoenix Spirit** | Luck level provides a direct multiplier to HP Regen speed. |
+| **RG + TM** | **Temporal Mend** | High-speed regeneration (triggers every 2s instead of 10s). |
+| **AR + MG** | **Tesla Coil** | While "Ghosting," shock nearby enemies and vacuum all items. |
+| **AR + LK** | **Gambler’s Guard** | Taking damage has a 25% chance to trigger a Power-Up drop. |
+| **AR + TM** | **Chrono-Ghost** | Extension of the "Ghost" window to 15s after a revival. |
+| **MG + LK** | **Jackpot Core** | Global pickup range; 25% chance for any item to be doubled. |
+| **MG + TM** | **Reverse Magnet** | Pulls enemies into the ship during "Ghost" windows for contact dmg. |
+| **LK + TM** | **Second Chance** | Removes revive cost; doubles Luck for 60s after revival. |
+
+*(HP: Max HP, RG: Regen, AR: Reflexive Armor, MG: Magnet, LK: Luck, TM: Time Machine)* 
+
+---
+
+## 5. Technical Specifications
+
+### Component Consumption Logic
+
+* 
+**Selection**: When a Synthesis Evolution is selected, the system flags the two base components as "Consumed." 
+
+* 
+**Pool Removal**: The "Consumed" components are removed from all other potential Synthesis checks. 
+
+* 
+**Example**: If you combine **Firing Rate** and **Piercing**, you cannot later combine **Firing Rate** with **Homing**, even if both are at the required levels. 
+
+
+
+### Reflexive Armor (Intermittent Ghosting)
+
+* 
+**Trigger**: On taking damage, the ship enters a "Ghost" state. 
+
+* 
+**Duration**: **(Level) seconds** of total invulnerability and collision-phasing. 
+
+* 
+**Visuals**: Transparency/flickering effect applied via `SpriteRenderer`. 

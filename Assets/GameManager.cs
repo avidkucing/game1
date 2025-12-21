@@ -1,6 +1,7 @@
-using System; // Required for DateTime
+using System; 
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic; // For tracking consumed components
 
 public class GameManager : MonoBehaviour
 {
@@ -9,17 +10,22 @@ public class GameManager : MonoBehaviour
     [Header("Game Settings")]
     public float scoreMultiplier = 1.0f;
 
+    [Header("Luck & Drop Economy")]
+    public int currentLuckLevel = 1; // Range 1-5
+    [HideInInspector] public int totalPowerUpsDropped = 0; // Tracks drops in current run
+
+    [Header("Synthesis System")]
+    // Tracks which components (FR, PR, etc.) are consumed by an Evolution
+    public HashSet<string> consumedComponents = new HashSet<string>();
+
     [Header("Energy System")]
     public int maxEnergy = 5;
     public int currentEnergy;
     public int energyCost = 1;
-    [Tooltip("Time in seconds to restore 1 Energy")]
-    public float rechargeDuration = 60f; // Set to 60 seconds for testing, increase for release
+    public float rechargeDuration = 60f; 
     
     private DateTime nextEnergyTime;
-    private bool isRestoring = false;
 
-    // Keys for saving data
     private const string EnergyKey = "Energy";
     private const string EnergyTimeKey = "EnergyTime";
     private const string HighScoreKey = "HighScore";
@@ -50,19 +56,14 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         highScore = PlayerPrefs.GetInt(HighScoreKey, 0);
-        
-        // Initialize Energy System
         LoadEnergy();
-        
         ShowMainMenu();
     }
 
     void Update()
     {
-        // 1. Handle Energy Timer (Always runs, even in menu)
         HandleEnergyRestoration();
 
-        // 2. Handle Gameplay
         if (!isGameActive) return;
 
         survivalTime += Time.deltaTime;
@@ -74,6 +75,22 @@ public class GameManager : MonoBehaviour
             UIController.Instance.UpdateTime(survivalTime);
             UIController.Instance.UpdateScore((int)currentScore);
         }
+    }
+
+    // --- NEW: SYNTHESIS LOGIC ---
+
+    public bool IsComponentAvailable(string componentID)
+    {
+        // Returns false if component was already used in an Evolution
+        return !consumedComponents.Contains(componentID);
+    }
+
+    public void ConsumeComponents(string id1, string id2)
+    {
+        // Mark base components as locked after synthesis
+        consumedComponents.Add(id1);
+        consumedComponents.Add(id2);
+        Debug.Log($"Synthesis Complete: {id1} and {id2} are now consumed.");
     }
 
     // --- ENERGY SYSTEM ---
@@ -102,12 +119,9 @@ public class GameManager : MonoBehaviour
         // If we are full, don't do anything
         if (currentEnergy >= maxEnergy)
         {
-            isRestoring = false;
             UpdateEnergyUI();
             return;
         }
-
-        isRestoring = true;
 
         // Check if we passed the "Next Energy Time"
         if (DateTime.Now >= nextEnergyTime)
@@ -178,29 +192,30 @@ public class GameManager : MonoBehaviour
         UpdateEnergyUI();
     }
 
-    // UPDATED: Now checks for energy before starting
+    // --- UPDATED GAME START ---
+
     public void TryStartGame()
     {
         if (currentEnergy >= energyCost)
         {
-            // Deduct Energy
             currentEnergy -= energyCost;
             PlayerPrefs.SetInt(EnergyKey, currentEnergy);
             
-            // If we were full, start the timer now
             if (currentEnergy == maxEnergy - energyCost)
             {
                 nextEnergyTime = DateTime.Now.AddSeconds(rechargeDuration);
                 SaveEnergyTime();
             }
 
-            // Actually Start
+            // Reset run-specific Luck stats
+            totalPowerUpsDropped = 0;
+            consumedComponents.Clear();
+
             StartGameLogic();
         }
         else
         {
             Debug.Log("Not Enough Energy to play!");
-            // Optional: Play a sound or shake UI
         }
     }
 
