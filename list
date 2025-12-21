@@ -1,0 +1,108 @@
+Based on the technical documentation provided and the current state of your project files, here is a comprehensive checklist to guide your next development steps for **Airforce Mayhem: Endless**.
+
+## Phase 1: Core Systems Foundation
+
+* [ ] **Implement the Luck & Sustainability Economy**:
+* Modify `EnemyController.cs` or `GameManager.cs` to track the number of drops occurred in a single run.
+
+
+* Add logic for the **50% multiplicative decay** and the **0.01% drop floor**.
+* Update `TryDropLoot` in `EnemyController.cs` to factor in the current Luck level for decay reduction and floor buffs.
+
+
+
+
+* [ ] **Expand Component Leveling**:
+* Increase `maxWeaponLevel` to 5 in `AutoShooter.cs`.
+
+
+* Create a parallel "DefenseComponent" script or add a list to `PlayerController.cs` to track the 6 defensive stats (HP, Regen, Armor, etc.).
+
+
+
+
+* [ ] **Create the "Sticky" Upgrade Selection Pool**:
+* Build a weighting algorithm that applies the **2.0x multiplier** to components already in the player's inventory.
+* Implement a `Reroll` function in the `GameManager` to allow for the 1 free run-based reroll.
+
+
+
+
+
+---
+
+## Phase 2: The Synthesis (Evolution) Engine
+
+* [ ] **Component Consumption Logic**:
+* Add a data structure (e.g., `Dictionary<string, bool>`) in `GameManager.cs` to flag components as **"Consumed"** once synthesized.
+* Ensure the upgrade pool filters out "Consumed" items so they no longer appear in the "Pick 1 of 3" UI.
+
+
+* [ ] **Evolution UI Implementation**:
+* Create a new panel in `UIController.cs` for the **"Pick 1 of 3"** selection.
+
+
+* Add logic to trigger this UI whenever a `PowerUp` is collected.
+
+
+
+
+* [ ] **Offensive Synthesis (15 Pairs)**:
+* Update `AutoShooter.cs` to handle the 15 unique evolution behaviors (e.g., Plasma Laser beam, Singularity Cannon gravity orb).
+
+
+
+
+* [ ] **Defensive Synthesis (15 Pairs)**:
+* Update `PlayerController.cs` to implement passive behaviors like **Vampiric Plating** (HP on kill) and **Jackpot Core** (Global pickup range).
+
+
+
+
+
+---
+
+## Phase 3: Specialized Mechanics & VFX
+
+* [ ] **Reflexive Armor (Ghosting)**:
+* Implement the timer-based invulnerability in `PlayerController.cs` triggered by `TakeDamage`.
+
+
+* Add the visual "flickering" effect using `SpriteRenderer.color.a`.
+
+
+* [ ] **Magnet & Gravity Logic**:
+* Create a "Magnet" radius logic that pulls `PowerUp` objects towards the player based on the Magnet level or Synthesis status.
+
+
+
+
+* [ ] **Regeneration Timer**:
+* Add a `coroutine` in `PlayerController.cs` to handle HP restoration every 10s (or 2s for **Temporal Mend**).
+
+
+
+---
+
+## Phase 4: Data & Cloud Integration
+
+* [ ] **PlayFab Highscore Sync**:
+* In `GameManager.GameOver()`, add a call to `PlayFabClientAPI.UpdatePlayerStatistics` to upload the `highScore` to a leaderboard.
+
+
+
+
+* [ ] **Energy System Polish**:
+* Ensure the `rechargeDuration` is balanced for live play (e.g., 5–10 minutes instead of 60s).
+
+
+
+
+* [ ] **Guest Account Conversion**:
+* Complete the "TODO" in `PlayFabLogin.cs` to show a "Link Google Account" button if `isGuest` is true.
+
+
+
+
+
+**Would you like me to provide the C# code for the Luck-based drop decay logic or the Synthesis weighting algorithm?**

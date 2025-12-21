@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System; // For TimeSpan
+using System.Collections.Generic; // For List<>
 
 public class UIController : MonoBehaviour
 {
@@ -21,6 +22,15 @@ public class UIController : MonoBehaviour
     public GameObject gameOverPanel;
     public TextMeshProUGUI finalScoreText;
     public TextMeshProUGUI finalHighScoreText;
+
+    [Header("Upgrade Selection UI")]
+    public GameObject upgradePanel;           // The main container for the choice UI
+    public Button[] upgradeButtons;           // Exactly 3 buttons in the panel
+    public TextMeshProUGUI[] upgradeNameTexts; // Text components for titles (e.g., "Fire Rate")
+    public TextMeshProUGUI[] upgradeDescTexts; // Text components for rarity/level info
+
+    // Keep track of current choices to apply the selection later
+    private List<UpgradeManager.UpgradeOption> currentChoices;
 
     void Awake()
     {
@@ -95,6 +105,58 @@ public class UIController : MonoBehaviour
                 finalHighScoreText.text = "NEW HIGH SCORE!";
             else
                 finalHighScoreText.text = "BEST: " + highScore.ToString("D6");
+        }
+    }
+
+    public void ShowUpgradePanel(List<UpgradeManager.UpgradeOption> choices)
+    {
+        currentChoices = choices;
+        upgradePanel.SetActive(true);
+
+        for (int i = 0; i < upgradeButtons.Length; i++)
+        {
+            if (i < choices.Count)
+            {
+                upgradeButtons[i].gameObject.SetActive(true);
+                
+                // Set text based on the upgrade data
+                upgradeNameTexts[i].text = choices[i].name;
+                
+                // Visual feedback for Rarity
+                upgradeDescTexts[i].text = choices[i].isEpic ? "<color=purple>EPIC</color>" : "Common";
+                upgradeDescTexts[i].text += "\nTap to Upgrade";
+            }
+            else
+            {
+                upgradeButtons[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    // Linked to the onClick() event of the 3 buttons in Unity (Index 0, 1, or 2)
+    public void SelectUpgrade(int index)
+    {
+        if (index >= currentChoices.Count) return;
+
+        var choice = currentChoices[index];
+        ApplyUpgrade(choice);
+
+        // Resume the game
+        upgradePanel.SetActive(false);
+        Time.timeScale = 1f;
+    }
+
+    private void ApplyUpgrade(UpgradeManager.UpgradeOption choice)
+    {
+        // Logic to increment levels
+        if (choice.id == "FR") 
+        {
+            GameManager.Instance.gunScript.UpgradeWeapon();
+        }
+        else if (PlayerController.Instance.defenseLevels.ContainsKey(choice.id))
+        {
+            PlayerController.Instance.defenseLevels[choice.id]++;
+            Debug.Log($"{choice.name} upgraded to Level {PlayerController.Instance.defenseLevels[choice.id]}");
         }
     }
 }

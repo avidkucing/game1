@@ -10,9 +10,10 @@ public class GameManager : MonoBehaviour
     [Header("Game Settings")]
     public float scoreMultiplier = 1.0f;
 
-    [Header("Luck & Drop Economy")]
-    public int currentLuckLevel = 1; // Range 1-5
-    [HideInInspector] public int totalPowerUpsDropped = 0; // Tracks drops in current run
+    [Header("Luck & Economy")]
+    public int luckLevel = 0; // Current Luck (Lv 0-5)
+    public int dropsInCurrentRun = 0; 
+    public float baseDropFloor = 0.0001f; // 0.01% base floor
 
     [Header("Synthesis System")]
     // Tracks which components (FR, PR, etc.) are consumed by an Evolution
@@ -75,6 +76,21 @@ public class GameManager : MonoBehaviour
             UIController.Instance.UpdateTime(survivalTime);
             UIController.Instance.UpdateScore((int)currentScore);
         }
+    }
+
+    // Helper to get the dynamic chance for EnemyController
+    public float GetCurrentDropChance()
+    {
+        // Decay reduction: Each Luck point reduces decay by 10%
+        float currentDecay = 0.5f * (1f - (luckLevel * 0.1f)); 
+        
+        // Floor buff: Each point increases floor by 20% compound
+        float currentFloor = baseDropFloor * Mathf.Pow(1.2f, luckLevel);
+        
+        // Multiplicative decay based on total drops so far
+        float calculatedChance = Mathf.Pow(currentDecay, dropsInCurrentRun);
+        
+        return Mathf.Max(calculatedChance, currentFloor);
     }
 
     // --- NEW: SYNTHESIS LOGIC ---
@@ -208,7 +224,7 @@ public class GameManager : MonoBehaviour
             }
 
             // Reset run-specific Luck stats
-            totalPowerUpsDropped = 0;
+            dropsInCurrentRun = 0;
             consumedComponents.Clear();
 
             StartGameLogic();

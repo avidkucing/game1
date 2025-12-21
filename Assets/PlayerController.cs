@@ -1,14 +1,29 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic; // Ensure this is at the top
 
 public class PlayerController : MonoBehaviour
 {
+    public static PlayerController Instance;
+
     [Header("Player Stats")]
     public int maxHealth = 5;
     private int currentHealth;
     
     private Camera mainCamera;
     private AutoShooter myShooter; // Reference to our gun
+
+    [Header("Defensive Components")]
+    // Tracks current levels for the 6 defensive types
+    public Dictionary<string, int> defenseLevels = new Dictionary<string, int>()
+    {
+        { "HP", 0 }, // Max HP
+        { "RG", 0 }, // Regen
+        { "AR", 0 }, // Reflexive Armor
+        { "MG", 0 }, // Magnet
+        { "LK", 0 }, // Luck
+        { "TM", 0 }  // Time Machine
+    };
 
     void Start()
     {
@@ -34,28 +49,32 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+   void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Enemy"))
         {
             TakeDamage(1);
             Destroy(other.gameObject);
         }
-        // NEW: Check for PowerUp collision
         else if (other.CompareTag("PowerUp"))
         {
-            CollectPowerUp();
-            Destroy(other.gameObject); // Remove the item from screen
+            // OLD: Directly upgraded weapon
+            // NEW: Trigger the Choice UI
+            OpenUpgradeUI(); 
+            Destroy(other.gameObject);
         }
     }
 
-    void CollectPowerUp()
+    void OpenUpgradeUI()
     {
-        Debug.Log("PowerUp Collected!");
-        if (myShooter != null)
-        {
-            myShooter.UpgradeWeapon();
-        }
+        // Pause the game
+        Time.timeScale = 0f;
+        
+        // Get choices from UpgradeManager
+        var choices = UpgradeManager.Instance.GetUpgradeChoices();
+        
+        // Tell UIController to show these choices
+        UIController.Instance.ShowUpgradePanel(choices);
     }
 
     void TakeDamage(int amount)

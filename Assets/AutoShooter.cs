@@ -8,8 +8,8 @@ public class AutoShooter : MonoBehaviour
     public Vector3 firePointOffset = new Vector3(0, 0.5f, 0);
 
     [Header("Upgrade System")]
-    public int currentWeaponLevel = 1;
-    public int maxWeaponLevel = 3;
+    public int currentWeaponLevel = 0;
+    public int maxWeaponLevel = 5;
 
     private float timer;
 
